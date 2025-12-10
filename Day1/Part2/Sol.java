@@ -1,4 +1,4 @@
-package Day1P2;
+package Day1.Part2;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -20,21 +20,36 @@ public class Sol {
 
   public static int secretEntrance(List<String> inputs) {
     int result = 0;
+    int extraClicks = 0;
     int currPosition = 50;
-
+    int preNormalized;
+    
     for (String input : inputs) {
       char direction = input.charAt(0);
       int directionAmount = Integer.parseInt(input.substring(1));
       
+      boolean startedZeroFlag = false;
+
+      if (currPosition == 0) startedZeroFlag = true;
+      
       if (direction == 'L') currPosition -= directionAmount;
       else if (direction == 'R') currPosition += directionAmount;
 
+      preNormalized = currPosition;   
       currPosition = normalizeValue(currPosition);
+
+      if (preNormalized < 0 || preNormalized > 99) {
+        if      (startedZeroFlag && directionAmount >= 100 && currPosition == 0)  extraClicks += directionAmount / 100 - 1;
+        else if (startedZeroFlag && directionAmount >= 100 && currPosition != 0)  extraClicks += directionAmount / 100;
+        else if (!startedZeroFlag && directionAmount >= 100 && currPosition == 0) extraClicks += directionAmount / 100;
+        else if (!startedZeroFlag && directionAmount >= 100 && currPosition != 0) extraClicks += directionAmount / 100;
+        else if (!startedZeroFlag && directionAmount < 100 && currPosition != 0) extraClicks++;
+      }
 
       if (currPosition == 0) result++;
     }
 
-    return result;
+    return result + extraClicks;
   }
 
   public static void main(String[] args) {
