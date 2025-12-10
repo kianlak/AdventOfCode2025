@@ -8,8 +8,6 @@ import java.util.List;
 
 public class Sol {
   public static int normalizeValue(int value) {
-    System.out.print(value + " ");
-
     if (value < 0) {
       value = 100 - ((-1 * value) % 100);
       value = value == 100 ? 0 : value;
@@ -17,7 +15,6 @@ public class Sol {
       value %= 100;
     }
 
-    System.out.println(value + " ");
     return value;
   }
 
