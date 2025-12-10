@@ -7,50 +7,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Sol {
-  public static int normalizeValue(int value) {
-    if (value < 0) {
-      value = 100 - ((-1 * value) % 100);
-      value = value == 100 ? 0 : value;
-    } else if (value > 99) {
-      value %= 100;
-    }
+  final static int STARTING_POSITION = 50;
+  final static int DIAL_SIZE = 100;
 
-    return value;
+  private static int parseRotation(String s) {
+    int multiplicator = s.charAt(0) == 'R' ? 1 : -1;
+    return multiplicator * Integer.parseInt(s.substring(1));
+  }
+
+  private static int calculateZerosPassed(int position, int rotation) {
+    if (rotation > 0) {
+      return position / DIAL_SIZE;
+    } else {
+      int zerosPassed = (DIAL_SIZE - position) / DIAL_SIZE;
+
+      boolean startedAtZero = position - rotation == 0;
+      if (startedAtZero) {
+        zerosPassed--;
+      }
+
+      return zerosPassed;
+    }
   }
 
   public static int secretEntrance(List<String> inputs) {
-    int result = 0;
-    int extraClicks = 0;
-    int currPosition = 50;
-    int preNormalized;
-    
-    for (String input : inputs) {
-      char direction = input.charAt(0);
-      int directionAmount = Integer.parseInt(input.substring(1));
-      
-      boolean startedZeroFlag = false;
+    int position = STARTING_POSITION;
+    int zeroCount = 0;
 
-      if (currPosition == 0) startedZeroFlag = true;
-      
-      if (direction == 'L') currPosition -= directionAmount;
-      else if (direction == 'R') currPosition += directionAmount;
-
-      preNormalized = currPosition;   
-      currPosition = normalizeValue(currPosition);
-
-      if (preNormalized < 0 || preNormalized > 99) {
-        if      (startedZeroFlag && directionAmount >= 100 && currPosition == 0)  extraClicks += directionAmount / 100 - 1;
-        else if (startedZeroFlag && directionAmount >= 100 && currPosition != 0)  extraClicks += directionAmount / 100;
-        else if (!startedZeroFlag && directionAmount >= 100 && currPosition == 0) extraClicks += directionAmount / 100;
-        else if (!startedZeroFlag && directionAmount >= 100 && currPosition != 0) extraClicks += directionAmount / 100;
-        else if (!startedZeroFlag && directionAmount < 100 && currPosition != 0) extraClicks++;
-      }
-
-      if (currPosition == 0) result++;
+    for (String line : inputs) {
+      int rotation = parseRotation(line);
+      position += rotation;
+      zeroCount += calculateZerosPassed(position, rotation);
+      position = Math.floorMod(position, DIAL_SIZE);
     }
 
-    return result + extraClicks;
+    return zeroCount;
   }
+
 
   public static void main(String[] args) {
     List<String> inputList = new ArrayList<>();
